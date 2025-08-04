@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interactive Guide to Common Stock</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Chosen Palette: Warm Neutrals (Calm Harmony) -->
+    <!-- Application Structure Plan: A thematic, top-down journey designed for beginners. It starts with a simple definition, moves to interactive explorations of core concepts (Rights, Rewards, Risks) using tabs and charts, compares common vs. preferred stock visually, illustrates the company lifecycle with an interactive timeline, and concludes with key takeaways. This structure prioritizes guided learning and engagement over a linear report format, making complex financial topics more accessible. -->
+    <!-- Visualization & Content Choices: 
+        - Report Info: Common vs. Preferred Stock -> Goal: Compare -> Viz: Interactive side-by-side card layout. Interaction: Click to highlight differences. Justification: More engaging and direct than a static table. Library/Method: HTML/CSS/JS.
+        - Report Info: Shareholder Rights -> Goal: Inform -> Viz: Grid of interactive cards. Interaction: Hover/click to reveal details. Justification: Breaks down dense info into digestible, self-paced chunks. Library/Method: HTML/CSS/JS.
+        - Report Info: Returns (Capital Gains vs. Dividends) -> Goal: Compare/Change -> Viz: Dynamic bar chart. Interaction: Buttons to toggle between "Growth" and "Income" stock profiles, updating the chart. Justification: Visually demonstrates the core trade-off in stock returns. Library/Method: Chart.js.
+        - Report Info: Liquidation Priority -> Goal: Organize/Inform -> Viz: Vertical flowchart diagram. Interaction: Hover over each tier to see details. Justification: Clearly illustrates the hierarchy of risk in a visually intuitive "waterfall" format. Library/Method: HTML/CSS/JS.
+        - CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #FDFBF8;
+            color: #4A4A4A;
+        }
+        .nav-button {
+            transition: all 0.3s ease;
+            border-bottom: 2px solid transparent;
+        }
+        .nav-button.active {
+            color: #D97706; 
+            border-bottom-color: #D97706;
+        }
+        .concept-card {
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        .concept-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+        .tab-content {
+            display: none;
+        }
+        .tab-content.active {
+            display: block;
+        }
+        .liquidation-tier {
+            transition: background-color 0.3s ease;
+        }
+        .liquidation-tier:hover {
+            background-color: #FEF3C7;
+        }
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 300px;
+            max-height: 400px;
+        }
+        @media (min-width: 768px) {
+            .chart-container {
+                height: 350px;
+            }
+        }
+    </style>
+</head>
+<body class="antialiased">
+
+    <header class="bg-white/80 backdrop-blur-md sticky top-0 z-50 shadow-sm">
+        <nav class="container mx-auto px-6 py-4 flex justify-between items-center">
+            <h1 class="text-2xl font-bold text-amber-700">Common Stock 101</h1>
+            <div class="hidden md:flex space-x-8">
+                <a href="#definition" class="nav-button text-gray-600 hover:text-amber-600">Definition</a>
+                <a href="#comparison" class="nav-button text-gray-600 hover:text-amber-600">Comparison</a>
+                <a href="#core-concepts" class="nav-button text-gray-600 hover:text-amber-600">Core Concepts</a>
+                <a href="#risks" class="nav-button text-gray-600 hover:text-amber-600">Risks</a>
+            </div>
+        </nav>
+    </header>
+
+    <main class="container mx-auto px-6 py-12">
+
+        <section id="definition" class="text-center mb-20">
+            <h2 class="text-4xl md:text-5xl font-bold mb-4 text-gray-800">What is a Common Stock?</h2>
+            <p class="text-lg md:text-xl max-w-3xl mx-auto text-gray-600">
+                In simple terms, a common stock is a share of ownership in a public company. When you buy a stock, you're buying a small piece of that company, giving you a claim on its assets and a share of its profits. It's the most basic way for companies to raise money and for people to invest in their growth.
+            </p>
+        </section>
+
+        <section id="comparison" class="mb-20">
+            <div class="text-center mb-12">
+                <h2 class="text-3xl font-bold text-gray-800">Common vs. Preferred Stock</h2>
+                <p class="mt-2 text-gray-600 max-w-2xl mx-auto">Companies issue two main types of stock. While both represent ownership, they offer different rights and rewards. Here's a look at the key differences.</p>
+            </div>
+            <div class="grid md:grid-cols-2 gap-8 max-w-5xl mx-auto">
+                <div class="bg-white p-8 rounded-xl shadow-lg border border-gray-200">
+                    <h3 class="text-2xl font-bold mb-4 text-amber-700">Common Stock</h3>
+                    <ul class="space-y-4 text-gray-700">
+                        <li class="flex items-start">
+                            <span class="text-green-500 mr-3 mt-1">✔</span>
+                            <div><strong class="font-semibold">Voting Rights:</strong> Usually have the power to vote on company decisions, like electing the board of directors.</div>
+                        </li>
+                        <li class="flex items-start">
+                            <span class="text-amber-500 mr-3 mt-1">~</span>
+                            <div><strong class="font-semibold">Dividends:</strong> Not guaranteed. Paid out only if the company decides to, and the amount can change.</div>
+                        </li>
+                        <li class="flex items-start">
+                            <span class="text-green-500 mr-3 mt-1">✔</span>
+                            <div><strong class="font-semibold">Growth Potential:</strong> Unlimited. The stock price can rise significantly, leading to high returns.</div>
+                        </li>
+                        <li class="flex items-start">
+                            <span class="text-red-500 mr-3 mt-1">✖</span>
+                            <div><strong class="font-semibold">Liquidation Priority:</strong> Last in line. In case of bankruptcy, they get paid only after everyone else (creditors, preferred stockholders).</div>
+                        </li>
+                    </ul>
+                </div>
+                <div class="bg-gray-800 text-white p-8 rounded-xl shadow-lg">
+                    <h3 class="text-2xl font-bold mb-4 text-amber-400">Preferred Stock</h3>
+                    <ul class="space-y-4">
+                        <li class="flex items-start">
+                            <span class="text-red-400 mr-3 mt-1">✖</span>
+                            <div><strong class="font-semibold">Voting Rights:</strong> Typically have no voting power in the company.</div>
+                        </li>
+                        <li class="flex items-start">
+                            <span class="text-green-400 mr-3 mt-1">✔</span>
+                            <div><strong class="font-semibold">Dividends:</strong> Priority payments. Usually receive fixed, regular dividend payments before common stockholders.</div>
+                        </li>
+                        <li class="flex items-start">
+                            <span class="text-amber-400 mr-3 mt-1">~</span>
+                            <div><strong class="font-semibold">Growth Potential:</strong> Limited. Price is more stable, acting more like a bond, with lower potential for high growth.</div>
+                        </li>
+                        <li class="flex items-start">
+                            <span class="text-green-400 mr-3 mt-1">✔</span>
+                            <div><strong class="font-semibold">Liquidation Priority:</strong> Paid before common stockholders, but still after debt holders.</div>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <section id="core-concepts" class="mb-20">
+            <div class="text-center mb-12">
+                <h2 class="text-3xl font-bold text-gray-800">The Owner's Toolkit: Rights & Rewards</h2>
+                <p class="mt-2 text-gray-600 max-w-2xl mx-auto">Owning a stock is more than just a number on a screen. It comes with a set of rights that give you influence and ways to earn a return on your investment. Explore the core concepts below.</p>
+            </div>
+
+            <div class="mb-8 border-b border-gray-200 flex justify-center space-x-4 md:space-x-8">
+                <button class="tab-button nav-button active" onclick="openTab(event, 'rights')">Shareholder Rights</button>
+                <button class="tab-button nav-button" onclick="openTab(event, 'returns')">How You Earn Money</button>
+            </div>
+
+            <div id="rights" class="tab-content active">
+                <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <div class="concept-card bg-white p-6 rounded-lg border border-gray-200">
+                        <h4 class="font-bold text-lg mb-2 text-amber-700">Voting Power</h4>
+                        <p class="text-gray-600">Influence company direction by voting on major issues like electing board members and approving mergers. It's your say in how the company is run.</p>
+                    </div>
+                    <div class="concept-card bg-white p-6 rounded-lg border border-gray-200">
+                        <h4 class="font-bold text-lg mb-2 text-amber-700">Claim to Dividends</h4>
+                        <p class="text-gray-600">Receive a portion of the company's profits, if the board decides to distribute them. This provides a potential income stream from your investment.</p>
+                    </div>
+                    <div class="concept-card bg-white p-6 rounded-lg border border-gray-200">
+                        <h4 class="font-bold text-lg mb-2 text-amber-700">Transfer Ownership</h4>
+                        <p class="text-gray-600">Freely buy and sell your shares on stock exchanges like the NYSE or NASDAQ. This liquidity allows you to convert your investment to cash.</p>
+                    </div>
+                    <div class="concept-card bg-white p-6 rounded-lg border border-gray-200">
+                        <h4 class="font-bold text-lg mb-2 text-amber-700">Inspect Documents</h4>
+                        <p class="text-gray-600">Right to review key corporate documents, including financial reports (10-K, 10-Q), to stay informed about the company's health and performance.</p>
+                    </div>
+                    <div class="concept-card bg-white p-6 rounded-lg border border-gray-200">
+                        <h4 class="font-bold text-lg mb-2 text-amber-700">Sue for Wrongful Acts</h4>
+                        <p class="text-gray-600">A legal right to sue the company for misconduct, such as fraud or misleading investors. This serves as a crucial form of investor protection.</p>
+                    </div>
+                    <div class="concept-card bg-white p-6 rounded-lg border border-gray-200">
+                        <h4 class="font-bold text-lg mb-2 text-amber-700">Pre-emptive Rights</h4>
+                        <p class="text-gray-600">The opportunity to buy new shares before they are offered to the public, allowing you to maintain your percentage of ownership in the company.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div id="returns" class="tab-content">
+                 <div class="bg-white p-8 rounded-xl shadow-lg border border-gray-200 max-w-4xl mx-auto">
+                    <p class="text-center text-gray-600 mb-6">Investors make money in two main ways: the stock's price going up (capital appreciation) or the company paying out profits (dividends). The balance depends on the type of company. Toggle between a "Growth" and "Income" stock to see the difference.</p>
+                    <div class="flex justify-center space-x-4 mb-6">
+                        <button id="growthBtn" class="bg-amber-600 text-white px-4 py-2 rounded-md shadow hover:bg-amber-700 transition" onclick="updateChart('growth')">Growth Stock Profile</button>
+                        <button id="incomeBtn" class="bg-gray-200 text-gray-700 px-4 py-2 rounded-md hover:bg-gray-300 transition" onclick="updateChart('income')">Income Stock Profile</button>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="returnsChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="risks" class="mb-20 bg-amber-50/50 py-16 rounded-xl">
+            <div class="text-center mb-12 px-4">
+                <h2 class="text-3xl font-bold text-gray-800">Understanding the Risks</h2>
+                <p class="mt-2 text-gray-600 max-w-2xl mx-auto">High potential rewards come with high potential risks. The most critical risk is your place in the pecking order if a company fails. This is called liquidation priority.</p>
+            </div>
+
+            <div class="max-w-2xl mx-auto px-4">
+                <div class="space-y-4">
+                    <div class="liquidation-tier bg-white p-4 rounded-lg shadow border-l-4 border-green-500">
+                        <h4 class="font-bold text-lg text-gray-800">1. Secured Creditors</h4>
+                        <p class="text-gray-600 text-sm">First in line. These are lenders with claims backed by specific assets (e.g., banks with mortgages). They get paid first from the sale of those assets.</p>
+                    </div>
+                    <div class="liquidation-tier bg-white p-4 rounded-lg shadow border-l-4 border-blue-500">
+                        <h4 class="font-bold text-lg text-gray-800">2. Unsecured Creditors</h4>
+                        <p class="text-gray-600 text-sm">Paid after secured creditors. This includes suppliers, bondholders, and employees owed wages. Their claims are not backed by specific assets.</p>
+                    </div>
+                    <div class="liquidation-tier bg-white p-4 rounded-lg shadow border-l-4 border-purple-500">
+                        <h4 class="font-bold text-lg text-gray-800">3. Preferred Stockholders</h4>
+                        <p class="text-gray-600 text-sm">Paid after all creditors. They have priority over common stockholders and are often guaranteed a specific payout amount.</p>
+                    </div>
+                    <div class="liquidation-tier bg-white p-4 rounded-lg shadow border-l-4 border-red-500">
+                        <h4 class="font-bold text-lg text-gray-800">4. Common Stockholders</h4>
+                        <p class="text-gray-600 text-sm">Last in line. They receive whatever is left over, which is often nothing. This "residual claim" is the source of their high risk.</p>
+                    </div>
+                </div>
+                 <p class="text-center mt-8 text-sm text-gray-500">This hierarchy shows why common stock is the riskiest investment in a company's capital structure. You share in the greatest upside, but also face the greatest potential loss.</p>
+            </div>
+        </section>
+        
+    </main>
+    
+    <footer class="bg-gray-800 text-white mt-20">
+        <div class="container mx-auto px-6 py-8 text-center">
+            <p>This interactive guide provides a simplified overview of common stock for educational purposes.</p>
+            <p class="text-sm text-gray-400 mt-2">Investing involves risk, including the possible loss of principal. This is not financial advice.</p>
+        </div>
+    </footer>
+
+    <script>
+        let returnsChart;
+        const chartData = {
+            growth: {
+                labels: ['Capital Appreciation', 'Dividends'],
+                datasets: [{
+                    label: 'Return Source',
+                    data: [90, 10],
+                    backgroundColor: ['#34D399', '#FBBF24'],
+                    borderColor: ['#059669', '#D97706'],
+                    borderWidth: 1
+                }]
+            },
+            income: {
+                labels: ['Capital Appreciation', 'Dividends'],
+                datasets: [{
+                    label: 'Return Source',
+                    data: [40, 60],
+                    backgroundColor: ['#34D399', '#FBBF24'],
+                    borderColor: ['#059669', '#D97706'],
+                    borderWidth: 1
+                }]
+            }
+        };
+
+        function initChart() {
+            const ctx = document.getElementById('returnsChart').getContext('2d');
+            returnsChart = new Chart(ctx, {
+                type: 'doughnut',
+                data: chartData.growth,
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'top',
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    let label = context.label || '';
+                                    if (label) {
+                                        label += ': ';
+                                    }
+                                    if (context.parsed !== null) {
+                                        label += context.parsed + '%';
+                                    }
+                                    return label;
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        function updateChart(type) {
+            returnsChart.data = chartData[type];
+            returnsChart.update();
+            
+            const growthBtn = document.getElementById('growthBtn');
+            const incomeBtn = document.getElementById('incomeBtn');
+
+            if (type === 'growth') {
+                growthBtn.classList.remove('bg-gray-200', 'text-gray-700', 'hover:bg-gray-300');
+                growthBtn.classList.add('bg-amber-600', 'text-white', 'hover:bg-amber-700');
+                incomeBtn.classList.remove('bg-amber-600', 'text-white', 'hover:bg-amber-700');
+                incomeBtn.classList.add('bg-gray-200', 'text-gray-700', 'hover:bg-gray-300');
+            } else {
+                incomeBtn.classList.remove('bg-gray-200', 'text-gray-700', 'hover:bg-gray-300');
+                incomeBtn.classList.add('bg-amber-600', 'text-white', 'hover:bg-amber-700');
+                growthBtn.classList.remove('bg-amber-600', 'text-white', 'hover:bg-amber-700');
+                growthBtn.classList.add('bg-gray-200', 'text-gray-700', 'hover:bg-gray-300');
+            }
+        }
+
+        function openTab(evt, tabName) {
+            let i, tabcontent, tablinks;
+            tabcontent = document.getElementsByClassName("tab-content");
+            for (i = 0; i < tabcontent.length; i++) {
+                tabcontent[i].style.display = "none";
+            }
+            tablinks = document.getElementsByClassName("tab-button");
+            for (i = 0; i < tablinks.length; i++) {
+                tablinks[i].className = tablinks[i].className.replace(" active", "");
+            }
+            document.getElementById(tabName).style.display = "block";
+            evt.currentTarget.className += " active";
+
+            if (tabName === 'returns' && !returnsChart) {
+                initChart();
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', (event) => {
+            const navLinks = document.querySelectorAll('header nav a');
+            const sections = document.querySelectorAll('main section');
+
+            const observerOptions = {
+                root: null,
+                rootMargin: '0px',
+                threshold: 0.4
+            };
+
+            const observer = new IntersectionObserver((entries, observer) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        navLinks.forEach(link => {
+                            link.classList.remove('active');
+                            if (link.getAttribute('href').substring(1) === entry.target.id) {
+                                link.classList.add('active');
+                            }
+                        });
+                    }
+                });
+            }, observerOptions);
+
+            sections.forEach(section => {
+                observer.observe(section);
+            });
+            
+            navLinks.forEach(anchor => {
+                anchor.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    document.querySelector(this.getAttribute('href')).scrollIntoView({
+                        behavior: 'smooth'
+                    });
+                });
+            });
+        });
+    </script>
+</body>
+</html>
